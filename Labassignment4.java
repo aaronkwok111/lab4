@@ -323,9 +323,12 @@ public class Labassignment4 {
                 System.out.println("Unable to display schedule for " + date);
 
             }
-            int day = Integer.parseInt(date.substring(4,5)) + 1;
-            String newDate = date.substring(0,4) + Integer.toString(day) + date.substring(5);
-            date = newDate;
+            // int day = Integer.parseInt(date.substring(4,5)) + 1;
+            // String newDate = date.substring(0,4) + Integer.toString(day) + date.substring(5);
+            // date = newDate;
+            String [] dateArr = date.split(" ");
+            int day = Integer.parseInt(dateArr[1]) + 1;
+            date = dateArr[0] + " " + Integer.toString(day);
             if(i < 6)
                 System.out.println("Day " + (i+2) + ":");
         }
