@@ -398,33 +398,55 @@ public class Labassignment4 {
         
         
         try{
-            ResultSet rs1 = statement.executeQuery("SELECT ActualStartTime, ActualArrivalTime " +
-                                                  "FROM ActualTripStopInfo " +
-                                                  "WHERE TripNumber = '" + tripNumber + "' AND " +
-                                                        "Date = '" + date + "' AND " +
-                                                        "ScheduledStartTime = '" + scheduledStartTime + "' AND " + 
-                                                        "StopNumber = '" + stopNumber + "'");
-            
-            rs1.next();
-            int wasChanged1 = statement.executeUpdate("UPDATE TripOffering " +
-                                          "SET ScheduledArrivalTime = '" + rs1.getString(2) + "' " +
-                                          "WHERE TripNumber = '" + tripNumber + "' AND " +
-                                              "Date = '" + date + "' AND " +
-                                              "ScheduledStartTime = '" + scheduledStartTime + "'");
-            
-            ResultSet rs2 = statement.executeQuery("SELECT ActualStartTime, ActualArrivalTime " +
-                                                  "FROM ActualTripStopInfo " +
-                                                  "WHERE TripNumber = '" + tripNumber + "' AND " +
-                                                        "Date = '" + date + "' AND " +
-                                                        "ScheduledStartTime = '" + scheduledStartTime + "' AND " + 
-                                                        "StopNumber = '" + stopNumber + "'");
-            rs2.next();
-            
-            int wasChanged2 = statement.executeUpdate("UPDATE TripOffering " +
-                                                      "SET ScheduledStartTime = '" + rs2.getString(1) + "' " +
-                                                      "WHERE TripNumber = '" + tripNumber + "' AND " +
-                                                            "Date = '" + date + "' AND " +
-                                                            "ScheduledStartTime = '" + scheduledStartTime + "'");
+            ResultSet resultset = statement.executeQuery("SELECT ScheduledArrivalTime" +
+                    "FROM TripOffering" +
+                    "WHERE TripNumber LIKE '" + tripNumber + "' AND " +
+                    "ScheduledStartTime LIKE '" + scheduledStartTime + "' AND " +
+                    "Date = '" + date + "' AND " +
+                    "Order by ScheduledArrivalTime ");
+
+            String ScheduledArrivalTime = "";
+            while(resultset.next()){
+                ScheduledArrivalTime = resultset.getString("ScheduledArrivalTime");
+            }
+
+            ResultSet resultset2 = statement.executeQuery("SELECT DrivingTime" +
+                    "FROM TripStopInfo" +
+                    "WHERE TripNumber LIKE '" + tripNumber + "' AND " +
+                    "StopNumber LIKE '" + stopNumber + "' AND " +
+                    "Order by DrivingTime ");
+
+            String DrivingTime = "";
+            while(resultset.next()){
+                DrivingTime = resultset.getString("DrivingTime");
+            }
+
+            String [] drivingTimeArr = DrivingTime.split(":");
+            String [] scheduledStartTimeArr = scheduledStartTime.split(":");
+            int hour = Integer.parseInt(drivingTimeArr[0]) + Integer.parseInt(scheduledStartTimeArr[0]);
+            int minute = Integer.parseInt(drivingTimeArr[1]) + Integer.parseInt(scheduledStartTimeArr[1]);
+
+            if (minute > 60){
+                minute = minute - 60;
+                hour += 1;
+            }
+            if (hour > 24){
+                hour = hour - 24;
+            }
+            String actualArrivalTime = Integer.toString(hour) + ":" + Integer.toString(minute);
+            String numOfPass = "100";
+            String numOfPassOut = " 100";
+
+            statement.execute("INSERT INTO ActualTripStopInfo VALUES ('"+ tripNumber +"','"
+                                                                        + date + "','" 
+                                                                        + scheduledStartTime + "','" 
+                                                                        + stopNumber + "','" 
+                                                                        + ScheduledArrivalTime + "','" 
+                                                                        + scheduledStartTime + "','" 
+                                                                        + actualArrivalTime + "','" 
+                                                                        + numOfPass + "','" 
+                                                                        + numOfPassOut + "')" );
+
         } catch(Exception e){
             System.out.println("Error! Information was not updated");
         }
