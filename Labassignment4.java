@@ -395,36 +395,43 @@ public class Labassignment4 {
         
         System.out.print("Enter Stop Number: ");
         String stopNumber = kb.nextLine();
+
+        System.out.print("Enter Actual Start Time: ");
+        String actualStartTime = kb.nextLine();
+
+        System.out.print("Enter Number of Passengers in Bus: ");
+        String numOfPass = kb.nextLine();
+
+        System.out.print("Enter Number of Passengers off Bus: ");
+        String numOfPassOut = kb.nextLine();
         
         
         try{
             ResultSet resultset = statement.executeQuery("SELECT ScheduledArrivalTime" +
                     "FROM TripOffering" +
-                    "WHERE TripNumber LIKE '" + tripNumber + "' AND " +
+                    "WHERE TripNumber = '" + tripNumber + "' AND " +
                     "ScheduledStartTime LIKE '" + scheduledStartTime + "' AND " +
-                    "Date = '" + date + "' AND " +
-                    "Order by ScheduledArrivalTime ");
+                    "Date = '" + date + "'");
 
-            String ScheduledArrivalTime = "";
+            String scheduledArrivalTime = "";
             while(resultset.next()){
-                ScheduledArrivalTime = resultset.getString("ScheduledArrivalTime");
+                scheduledArrivalTime = resultset.getString("ScheduledArrivalTime");
             }
-
+            
             ResultSet resultset2 = statement.executeQuery("SELECT DrivingTime" +
                     "FROM TripStopInfo" +
-                    "WHERE TripNumber LIKE '" + tripNumber + "' AND " +
-                    "StopNumber LIKE '" + stopNumber + "' AND " +
-                    "Order by DrivingTime ");
+                    "WHERE TripNumber = '" + tripNumber + "' AND " +
+                    "StopNumber LIKE '" + stopNumber + "'");
 
             String DrivingTime = "";
-            while(resultset.next()){
-                DrivingTime = resultset.getString("DrivingTime");
+            while(resultset2.next()){
+                DrivingTime = resultset2.getString("DrivingTime");
             }
 
             String [] drivingTimeArr = DrivingTime.split(":");
-            String [] scheduledStartTimeArr = scheduledStartTime.split(":");
-            int hour = Integer.parseInt(drivingTimeArr[0]) + Integer.parseInt(scheduledStartTimeArr[0]);
-            int minute = Integer.parseInt(drivingTimeArr[1]) + Integer.parseInt(scheduledStartTimeArr[1]);
+            String [] actualStartTimeArr = actualStartTime.split(":");
+            int hour = Integer.parseInt(drivingTimeArr[0]) + Integer.parseInt(actualStartTimeArr[0]);
+            int minute = Integer.parseInt(drivingTimeArr[1]) + Integer.parseInt(actualStartTimeArr[1]);
 
             if (minute > 60){
                 minute = minute - 60;
@@ -434,15 +441,13 @@ public class Labassignment4 {
                 hour = hour - 24;
             }
             String actualArrivalTime = Integer.toString(hour) + ":" + Integer.toString(minute);
-            String numOfPass = "100";
-            String numOfPassOut = " 100";
 
             statement.execute("INSERT INTO ActualTripStopInfo VALUES ('"+ tripNumber +"','"
                                                                         + date + "','" 
                                                                         + scheduledStartTime + "','" 
                                                                         + stopNumber + "','" 
-                                                                        + ScheduledArrivalTime + "','" 
-                                                                        + scheduledStartTime + "','" 
+                                                                        + scheduledArrivalTime + "','" 
+                                                                        + actualStartTime + "','" 
                                                                         + actualArrivalTime + "','" 
                                                                         + numOfPass + "','" 
                                                                         + numOfPassOut + "')" );
